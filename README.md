@@ -1,2 +1,2 @@
 # whereisISS
-Where is the International Space Station 
+This project shows the real time location of the International Space Station.
