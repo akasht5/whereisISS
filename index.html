@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css">
+</head>
+<style>
+    #myMap{
+        height:500px;
+    }
+</style>
+<body>   
+    <h1>Where is the ISS at ?</h1>
+    <p>Latitude : <span id="lat"></span></p>
+    <p>Longitude : <span id="long"></span></p>
+
+    <div id="myMap"></div>
+
+     <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+ integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+ crossorigin=""></script>
+    <script>
+
+        /* Position of the ISS using external API */
+        let latitude,longitude;
+        //set the map
+        let map = L.map('myMap').setView([0,0],1);
+        //create an icon
+        const myIcon = L.icon({
+            iconUrl: 'iss.png',
+            iconSize: [60, 40],
+            iconAnchor:[30,20]
+            
+        });      
+        //add the marker                                 
+        let marker = L.marker([0,0],{icon:myIcon}).addTo(map);
+    
+        //create tiles from openstreet
+        const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+        const tileURL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+        //add tiles to map
+        L.tileLayer(tileURL,{attribution}).addTo(map);
+
+        //This function is to fetch the ISS lat,long values
+        async function getISS(){
+            const response = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
+            const data = await response.json();
+            latitude = data.latitude;
+            longitude = data.longitude;  
+            marker.setLatLng([latitude,longitude]);
+            
+            map.setView([latitude,longitude],5);
+            
+            document.getElementById('lat').textContent = latitude;
+            document.getElementById('long').textContent = longitude;  
+        }
+        getISS();
+
+        //Use SetInterval to update the position of ISS every sec.
+        setInterval(getISS,1000);
+        
+    </script>
+</body>
+</html>
